@@ -228,9 +228,6 @@ def upload(request):
     """
     Multipe File Upload.
     """
-    
-    from django.http import parse_cookie
-    
     # QUERY / PATH CHECK
     query = request.GET
     path = get_path(query.get('dir', ''))
@@ -238,7 +235,6 @@ def upload(request):
         msg = _('The requested Folder does not exist.')
         messages.warning(request,message=msg)
         return HttpResponseRedirect(reverse("fb_browse"))
-    abs_path = _check_access(request, path)
     
     # SESSION (used for flash-uploading)
     session_key = request.COOKIES.get(settings.SESSION_COOKIE_NAME, None)
@@ -297,6 +293,7 @@ def _upload_file(request):
         fb_uploadurl_re = re.compile(r'^.*(%s)' % reverse("fb_upload"))
         folder = fb_uploadurl_re.sub('', folder)
         abs_path = _check_access(request, folder)
+        
         if request.FILES:
             filedata = request.FILES['Filedata']
             filedata.name = convert_filename(filedata.name)
@@ -313,7 +310,8 @@ def _upload_file(request):
                 file_move_safe(new_file, old_file)
             # POST UPLOAD SIGNAL
             filebrowser_post_upload.send(sender=request, path=request.POST.get('folder'), file=FileObject(smart_str(os.path.join(fb_settings.DIRECTORY, folder, filedata.name))))
-    return HttpResponse('True')
+    redirect_url = "%s?dir=%s" % (reverse("fb_browse"), folder)
+    return HttpResponseRedirect(redirect_url)
 
 
 # delete signals
