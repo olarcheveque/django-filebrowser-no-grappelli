@@ -290,6 +290,7 @@ def _upload_file(request):
     
     if request.method == 'POST':
         folder = request.POST.get('folder')
+        folder = request.POST.get('folder')
         fb_uploadurl_re = re.compile(r'^.*(%s)' % reverse("fb_upload"))
         folder = fb_uploadurl_re.sub('', folder)
         abs_path = _check_access(request, folder)
@@ -310,7 +311,7 @@ def _upload_file(request):
                 file_move_safe(new_file, old_file)
             # POST UPLOAD SIGNAL
             filebrowser_post_upload.send(sender=request, path=request.POST.get('folder'), file=FileObject(smart_str(os.path.join(fb_settings.DIRECTORY, folder, filedata.name))))
-    redirect_url = "%s?dir=%s" % (reverse("fb_browse"), folder)
+    redirect_url = "%s?%s" % (reverse("fb_browse"), request.POST.get('get'))
     return HttpResponseRedirect(redirect_url)
 
 

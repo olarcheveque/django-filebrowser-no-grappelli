@@ -37,6 +37,9 @@
                 <input  type="hidden"
                         name="folder"
                         value="{{ query.dir }}" />
+                <input  type="hidden"
+                        name="get"
+                        value="{{ request.META.QUERY_STRING }}" />
 
                  <input type="file" name="Filedata" />
 
